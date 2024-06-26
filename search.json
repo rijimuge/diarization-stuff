@@ -1,0 +1,52 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "diarization-stuff",
+    "section": "",
+    "text": "This file will become your README and also the index of your documentation.",
+    "crumbs": [
+      "diarization-stuff"
+    ]
+  },
+  {
+    "objectID": "index.html#install",
+    "href": "index.html#install",
+    "title": "diarization-stuff",
+    "section": "Install",
+    "text": "Install\npip install diarization_stuff",
+    "crumbs": [
+      "diarization-stuff"
+    ]
+  },
+  {
+    "objectID": "index.html#how-to-use",
+    "href": "index.html#how-to-use",
+    "title": "diarization-stuff",
+    "section": "How to use",
+    "text": "How to use\nFill me in please! Don’t forget code examples:\n\n1+1\n\n2",
+    "crumbs": [
+      "diarization-stuff"
+    ]
+  },
+  {
+    "objectID": "improve_with_claudette.html",
+    "href": "improve_with_claudette.html",
+    "title": "diarization-stuff",
+    "section": "",
+    "text": "import os from claudette import *\n\n\nos.environ['ANTHROPIC_API_KEY'] = 'your-api-key'\n\n\nmodel = models[1] #sonnet 3.5\n\n\nchat = Chat(model, sp=\"\"\"You are a helpful and concise assistant that will correct a diarization script.\"\"\")\n\n\ndef process_chunk(chunk, index, total_chunks):\n    global chat\n    if index == 0:\n        prompt = f'''In the speaker diarization transcript below, some words are potentially misplaced due to bleeding. As in one speaker is talking then immediately after a second speaker is talking, and the first words of the second speaker are attributed to the last words of the second speaker. I need you to read the meaning and context of the sentences and make your best guess about how the sentences should be re-distributed \n                  They may also be displaced in the following manner-- Two or more speakers speak, and the words are all attributed to one speaker, when actually 2 or three speakers spoke like this: speaker_1 \"talking\" speaker_2 \"talking\" speaker_1 \"talking\", but all the transcription captures is speaker_1 \"talking talking talking\" \n                  Please correct those words and move them to the right speaker. Directly show the corrected transcript without explaining what changes were made or why you made those changes. \n                  This is the first of {total_chunks} parts. Correct this chunk in isolation. Text to correct is indicated by this tag &lt;text-to-correct&gt;&lt;/text-to-correct&gt;\n                  Feel free to attempt to correct the speaker identified, for example if it says it is speaker_01, but you think it is speaker_02, correct that, also if you know the actual name of a character, replace the \"SPEAKER_01\" with it's actual character name\n                  &lt;text-to-correct&gt;{chunk}&lt;/text-to-correct&gt;\n                '''\n    else:\n        if index % 2 == 0:\n            chat = Chat(model, sp=\"\"\"You are a helpful and concise assistant that will correct a diarization script.\"\"\")\n        prompt = f'''In the speaker diarization transcript below, some words are potentially misplaced.\n                  Please correct those words and move them to the right speaker. Directly show the corrected transcript without explaining what changes were made or why you made those changes.\n                  Continue diarization from previous {index} parts, maintaining consistent speaker attribution and context. The diarization transcript to correct is indicated by this tag &lt;text-to-correct&gt;&lt;/text-to-correct&gt;\n                  This is part {index + 1} of {total_chunks}. Correct the section indicated by &lt;previous-corrected-text&gt;&lt;/previous-corrected-text&gt; only, and directly show the corrected transcript without explaining what changes were made or why you made those changes.\n                  Feel free to attempt to correct the speaker identified, for example if it says it is speaker_01, but you think it is speaker_02, correct that, also if you know the actual name of a character, replace the \"SPEAKER_01\" with it's actual character name\n                  &lt;text-to-correct&gt;{chunk}&lt;/text-to-correct&gt;\n                '''\n    \n    r = chat(prompt)\n    print(f\"Processed chunk {index + 1} of {total_chunks}\")\n    corrected_text = contents(r)\n    return corrected_text\n\n\ndef read_and_chunk(file_path, max_size=20000):\n    with open(file_path, 'r', encoding='utf-8') as file:\n        text = file.read()\n\n    lines = text.split('\\n')\n    chunks = []\n    current_chunk = \"\"\n\n    for line in lines:\n        if len(current_chunk + '\\n' + line) &gt; max_size:\n            chunks.append(current_chunk)\n            current_chunk = line\n        else:\n            if current_chunk:\n                current_chunk += '\\n' + line\n            else:\n                current_chunk = line\n\n    if current_chunk:\n        chunks.append(current_chunk)\n    return chunks\n\n\ndef process_conversation(file_path):\n    chunks = read_and_chunk(file_path)\n    results = []\n    context = \"\"\n\n    for index, chunk in enumerate(chunks):\n        corrected_text = process_chunk(chunk, context, index, len(chunks))\n        results.append(corrected_text)\n        context = corrected_text\n\n    return '\\n'.join(results)\n\n\ndef write_results_to_file(original_file_path, processed_text):\n    improved_file_path = f\"improved_{original_file_path}\"\n    with open(improved_file_path, 'w', encoding='utf-8') as file:\n        file.write(processed_text)\n    print(f\"Results written to {improved_file_path}\")\n\n\nprint(\"Current working directory:\", os.getcwd())\nprint(\"Files in current directory:\", os.listdir())\n\n\nconversation_path = 'diarization/transcription_output_A_Ch.txt'\nimproved_path = 'transcription_output_A_Ch.txt'\nprocessed_text = process_conversation(conversation_path)\nwrite_results_to_file(improved_path, processed_text)",
+    "crumbs": [
+      "improve_with_claudette.html"
+    ]
+  },
+  {
+    "objectID": "core.html",
+    "href": "core.html",
+    "title": "core",
+    "section": "",
+    "text": "source\n\nfoo\n\n foo ()",
+    "crumbs": [
+      "core"
+    ]
+  }
+]
